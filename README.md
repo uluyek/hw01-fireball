@@ -1,7 +1,7 @@
 # [Project 1: Noise](https://github.com/CIS-566-Fall-2022/hw01-fireball-base)
 
 ## Submission
-
+Name: Keyu Lu
 ### View my Live Demo here: 
 Demo Site: [Live Demo](https://uluyek.github.io/hw01-fireball/)
 
