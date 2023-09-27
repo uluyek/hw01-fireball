@@ -5,8 +5,10 @@ Name: Keyu Lu
 ### View my Live Demo here: 
 Demo Site: [Live Demo](https://uluyek.github.io/hw01-fireball/)
 
+GIF Image:
 ![GIF DEMO](https://github.com/uluyek/hw01-fireball/blob/master/566%20HW1%20Demo.gif)
 
+Still Image:
 ![Image](https://github.com/uluyek/hw01-fireball/blob/master/CIS%20566%20HW1.png)
 
 ### Project Summary
