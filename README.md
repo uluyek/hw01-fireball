@@ -9,6 +9,8 @@ Demo Site: [Live Demo](https://uluyek.github.io/hw01-fireball/)
 
 ### Project Summary
 
+My project combines vertex and fragment shaders to produce intricate and dynamic visual effects. The vertex shader displaces the geometry's vertices by implementing high-amplitude, low-frequency displacement and higher-frequency, lower-amplitude Fractal Brownian Motion (fbm), along with domain warping to create finer details. The fragment shader generates dynamic, layered noise patterns using Perlin noise and fbm, further modifying them with time to achieve animated textures, and employs a gradient color function to apply diverse coloring based on the generated noise and turbulence values. Both shaders are enriched with customizable uniform variables for NoiseScale, NoiseFreq, and FbmAmplitude, enabling extensive control over the visual outputs' aesthetics and noise characteristics.
+
 ## Objective
 
 Get comfortable with using WebGL and its shaders to generate an interesting 3D, continuous surface using a multi-octave noise algorithm.
