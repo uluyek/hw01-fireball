@@ -2,6 +2,7 @@
 
 ## Submission
 [Live Demo](https://uluyek.github.io/hw01-fireball/)
+![GIF DEMO](https://videoapi-muybridge.vimeocdn.com/animated-thumbnails/image/b983e109-84df-4e93-ae64-340f1923ae17.gif?ClientID=vimeo-core-prod&Date=1695780864&Signature=a5bcb134a24c03b90a4a541228b92ba9ea9f5ebd)
 
 ## Objective
 
