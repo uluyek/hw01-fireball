@@ -15,6 +15,9 @@ const controls = {
   tesselations: 5,
   'Load Scene': loadScene, // A function pointer, essentially
   color: [255, 255, 255, 1],  // Default color as an RGB array
+  noiseScale: 0.066, // Added default value for noiseScale
+  noiseFreq: 4.0, // Added default value for noiseFreq
+  fbmAmplitude: 0.1, // Added default value for fbmAmplitude
 };
 
 let icosphere: Icosphere;
@@ -51,14 +54,21 @@ function main() {
   gui.add(controls, 'tesselations', 0, 8).step(1);
   gui.add(controls, 'Load Scene');
   // this.unifColor = gl.getUniformLocation(this.prog, "u_Color");
-  gui.addColor(controls, 'color').name('Cube Color').onChange((color: number[]) => {
+  gui.addColor(controls, 'color').name('Pick Color').onChange((color: number[]) => {
     console.log("New color picked: ", color);
     //const normalizedColor = color.slice(0, 3).map(val => val / 255) as number[];
     //const vec4Color = new Float32Array([...normalizedColor, controls.color[3]]);  // Use alpha channel
     //lambert.setGeometryColor(vec4Color);
   });
-  
-
+  // Add controls
+  /*
+  gui.add(controls, 'noiseScale', 0.01, 0.2).name('Noise Scale').onChange(value => lambert.setNoiseScale(value));
+  gui.add(controls, 'noiseFreq', 0.1, 15.0).name('Noise Frequency').onChange(value => lambert.setNoiseFreq(value));
+  gui.add(controls, 'fbmAmplitude', 0.01, 0.2).name('FBM Amplitude').onChange(value => lambert.setFbmAmplitude(value));
+  */
+  gui.add(controls, 'noiseScale', 0.01, 0.2).name('Noise Scale').onChange(value => lambert.setNoiseScale(value));
+  gui.add(controls, 'noiseFreq', 0.1, 15.0).name('Noise Frequency').onChange(value => lambert.setNoiseFreq(value));
+  gui.add(controls, 'fbmAmplitude', 0.01, 0.2).name('FBM Amplitude').onChange(value => lambert.setFbmAmplitude(value));
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
   const gl = <WebGL2RenderingContext> canvas.getContext('webgl2');
@@ -121,12 +131,13 @@ function main() {
      const normalizedColor = controls.color.slice(0, 3).map(val => val / 255) as number[];
      const alpha = 1;  // or whatever your alpha value is
      const vec4Color = vec4.fromValues(normalizedColor[0], normalizedColor[1], normalizedColor[2], alpha);
-     
-    renderer.render(camera, lambert, vec4Color, [
+    /*
+    renderer.renderNoise(camera, lambert, vec4Color, [
       icosphere,
       //square//,
       //cube
-    ], time);
+    ], time, noiseScale, noiseFreq, fbmAmplitude);*/
+    renderer.renderNoise(camera, lambert, vec4Color, [icosphere], time, controls.noiseScale, controls.noiseFreq, controls.fbmAmplitude);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame

@@ -19,6 +19,10 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
                             // We've written a static matrix for you to use for HW2,
                             // but in HW3 you'll have to generate one yourself
 uniform float u_Time;
+uniform float u_NoiseScale;
+uniform float u_NoiseFreq;
+uniform float u_FbmAmplitude;
+//uniform float u_RotationSpeed;
 
 in vec4 vs_Pos;             // The array of vertex positions passed to the shader
 
@@ -140,38 +144,41 @@ vec4 getFireColor(float value) {
 }
 
 void main() {
-    float noiseScale = 0.01; // Adjust the scale of the noise
-    float noiseFreq = 1.0;  // Adjust the frequency of the noise
+    float u_RotationSpeed = 100.0;
+    float angle = u_Time * u_RotationSpeed; // rotationSpeed is a constant that determines how fast the object rotates
+    mat4 rotationMatrix = mat4(
+        cos(angle), 0.0, sin(angle), 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        -sin(angle), 0.0, cos(angle), 0.0,
+        0.0, 0.0, 0.0, 1.0
+    );
+        // Apply Rotation to modelposition
+    vec4 rotatedPosition = rotationMatrix * (u_Model * vs_Pos);
     
+    // Compute Displacement based on rotatedPosition
+    float rotatedDisplacement = pnoise((rotatedPosition.xyz + vec3(u_Time * 0.03)) * u_NoiseFreq) * u_NoiseScale;
+    vec3 newRotatedPosition = rotatedPosition.xyz + normalize(rotatedPosition.xyz) * rotatedDisplacement;
+    
+    // Old Computations based on modelposition
     vec4 modelposition = u_Model * vs_Pos;
-    
-    // Create a noise-based displacement for the vertex
-    // Incorporate time in your noise calculation to make the noise evolve over time
-   
-
-    float displacement = pnoise((modelposition.xyz + vec3(float(u_Time) * 0.03)) * noiseFreq) * noiseScale;
+    float displacement = pnoise((modelposition.xyz + vec3(u_Time * 0.03)) * u_NoiseFreq) * u_NoiseScale;
     vec3 newPosition = modelposition.xyz + normalize(modelposition.xyz) * displacement;
-     // Apply Domain Warping
-    vec3 warpedPosition = newPosition + vec3(pnoise(newPosition * 1.4) * 0.5);
-    float warpedDisplacement = pnoise((warpedPosition + vec3(float(u_Time) * 0.01)) * noiseFreq) * noiseScale;
-    newPosition += normalize(newPosition) * warpedDisplacement;
 
-    float fbmValue = fbm(newPosition * 6.0); // High frequency
-    newPosition += normalize(newPosition) * fbmValue * 0.05; // Small amplitude high-frequency displacement
+    // Warping and additional displacement computations
+    vec3 warpedPosition = newRotatedPosition + vec3(pnoise(newRotatedPosition * 1.4) * 0.5);
+    float warpedDisplacement = pnoise((warpedPosition + vec3(u_Time * 0.01)) * u_NoiseFreq) * u_NoiseScale;
+    newPosition += normalize(newRotatedPosition) * warpedDisplacement;
 
+    float fbmValue = fbm(newRotatedPosition * u_NoiseFreq * 6.0);
+    newPosition += normalize(newRotatedPosition) * fbmValue * u_FbmAmplitude;
     
+    // Final Vertex Position
     gl_Position = u_ViewProj * vec4(newPosition, 1.0);
-
-    fs_Col = getFireColor(fbmValue * 0.5 + 0.5); // Normalize FBM value to [0, 1] and get color
-
-
+    
+    // Fragment Shader inputs
+    fs_Col = getFireColor(fbmValue * 0.5 + 0.5);
     mat3 invTranspose = mat3(u_ModelInvTr);
-    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0); 
-
+    fs_Nor = vec4(invTranspose * vec3(vs_Nor), 0);
     fs_LightVec = lightPos - vec4(newPosition, 1.0);  
-
-    modelposition= u_Model * (vs_Pos);
-
-
     fs_Pos = modelposition;
 }

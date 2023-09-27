@@ -11,6 +11,9 @@ in vec4 fs_Pos;  // Assuming you have 3D position information
 
 out vec4 out_Col;
 uniform float u_Time; // Changed from time to u_Time to be consistent with the vertex shader.
+uniform float u_NoiseScale;
+uniform float u_NoiseFreq;
+uniform float u_FbmAmplitude;
 const int NoiseSteps = 10; // Number of noise octaves
 
 vec3 fade(vec3 t) {
@@ -123,7 +126,24 @@ float fbm3D(vec3 p)
 
     return total;
 }
+/*
+float fbm3D(vec3 p)
+{
+    float total = 0.0;
+    float persistence = 0.5;
+    float amplitude = u_FbmAmplitude; // Use the uniform amplitude
+    int octaves = NoiseSteps; // Use NoiseSteps as octaves since you've declared it as a const int
 
+    for (int i = 0; i < octaves; ++i)
+    {
+        float freq = pow(2.0, float(i)) * u_NoiseFreq; // Use the uniform noise frequency
+        total += amplitude * pnoise(p * freq * u_NoiseScale); // Use the uniform noise scale
+        amplitude *= persistence;
+    }
+
+    return total;
+}
+*/
 void main()
 {
     float turbulence = 0.3;
@@ -140,4 +160,20 @@ void main()
     vec4 color = vec4(getGradientColor(clamp(turbulence + fbmValue, 0.0, 0.9)).xyz, 1.0);
     
     out_Col = color;
+    /*
+    float turbulence = 0.3 * u_NoiseScale; // Use the uniform noise scale
+    float frequency = 2.0 * u_NoiseFreq; // Use the uniform noise frequency
+    float amplitude = 1.2 * u_FbmAmplitude; // Use the uniform amplitude
+    for(int i = 0; i < 3; i++) { // Layering noise
+        turbulence += pow(abs(pnoise(fs_Pos.xyz * frequency + vec3(u_Time * 0.01))), 2.0) * amplitude;
+        frequency *= 2.0; // you can modify this as per your need or can use u_NoiseFreq
+        amplitude *= 0.5; // you can modify this as per your need or can use u_FbmAmplitude
+    }
+    turbulence = pow(turbulence, 1.4); // Increasing contrast
+
+    float fbmValue = fbm3D(fs_Pos.xyz + vec3(u_Time * 0.01));
+    vec4 color = vec4(getGradientColor(clamp(turbulence + fbmValue, 0.0, 0.9)).xyz, 1.0);
+    
+    out_Col = color;
+    */
 }

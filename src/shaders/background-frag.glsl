@@ -2,11 +2,11 @@
 precision highp float; // add this line
 
 
-in vec2 fs_UV;
-
 uniform float u_Time; // You can pass current time from your application to animate the lava effect
 
-out vec4 outColor;
+in vec2 fs_Pos;
+out vec4 out_Col;
+
 
 
 vec3 fade(vec3 t) {
@@ -20,8 +20,6 @@ vec4 permute(vec4 x) {
 vec4 taylorInvSqrt(vec4 r) {
     return 1.79284291400159 - 0.85373472095314 * r;
 }
-
-
 
 float pnoise(vec3 P)
 {
@@ -120,31 +118,36 @@ float fbm3D(vec3 p)
     return total;
 }
 
-
-void main()
-{
-    vec3 fs_Pos = vec3(fs_UV, u_Time);
-
-    float turbulence = 0.0;
-    float frequency = 0.5;
-    float amplitude = 1.5;
-    for(int i = 0; i < 3; i++) {
-        turbulence += pow(abs(pnoise(fs_Pos.xyz * frequency + vec3(u_Time * 0.01))), 2.0) * amplitude;
-        frequency *= 2.0;
-        amplitude *= 0.5;
-    }
-    turbulence = pow(turbulence, 2.0);
-
-    float fbmValue = fbm3D(fs_Pos.xyz + vec3(u_Time * 0.01));
-    vec3 noiseColor = getGradientColor(clamp(turbulence + fbmValue, 0.0, 0.9)).xyz;
+void main() {
     
-    // Lava color map
-    vec3 lavaColor = mix(vec3(0.0, 0.0, 0.0), vec3(1.0, 0.0, 0.0), fbmValue * 0.5 + 0.5);
-    lavaColor = mix(lavaColor, vec3(1.0, 0.5, 0.0), turbulence * 0.5 + 0.5);
+    vec2 uv = fs_Pos;
+    uv *= 2.2;
     
-    // Combine both patterns
-    vec3 finalColor = mix(noiseColor, lavaColor, 0.5);
+    float pnoiseVal = pnoise(vec3(uv, u_Time * 0.01));
+    float fbm3DVal = fbm3D(vec3(uv, u_Time * 0.01));
     
-    outColor = vec4(finalColor, 1.0);
+    // Maintaining dark brown as a base color
+    vec3 baseColor = vec3(.212, 0.08, 0.03);
+    
+    // Defining a vibrant orange color for the noise highlights
+    vec3 highlightColor = vec3(1.0, 0.5, 0.0); 
+    
+    // Mixing noises to add complexity and to highlight the noise
+    vec3 noiseColor = mix(baseColor, highlightColor, fbm3DVal);
+    noiseColor = mix(noiseColor, highlightColor, pnoiseVal);
+    
+    // Complicating the color using multiple noise functions and base color
+    vec3 col = baseColor + noiseColor * fbm3DVal;
+    
+    // Boosting the contrast and decreasing the overall brightness
+    col = pow(col, vec3(1.2)) * 0.7; // power > 1.0 increases contrast, adjust the multiplier for brightness
+    
+    // Optionally adding gradient to further complicate
+    col += getGradientColor(mix(fbm3DVal, pnoiseVal, 0.5)).rgb * 0.1;
+    
+    // Clamping the final color to make sure it doesn’t exceed 1.0
+    col = clamp(col, 0.0, 1.0);
+    
+    out_Col = vec4(col, 1.0);
+
 }
-

@@ -37,6 +37,26 @@ class OpenGLRenderer {
       prog.draw(drawable);
     }
   }
+
+  renderNoise(camera: Camera, prog: ShaderProgram, color: vec4, drawables: Array<Drawable>, time: number, 
+    noiseScale: number = 0.11, noiseFreq: number = 2.8, fbmAmplitude: number = 0.08) {
+    let model = mat4.create();
+    let viewProj = mat4.create();
+
+    mat4.identity(model);
+    mat4.multiply(viewProj, camera.projectionMatrix, camera.viewMatrix);
+    prog.setModelMatrix(model);
+    prog.setViewProjMatrix(viewProj);
+    prog.setGeometryColor(color);
+    prog.setTime(time);
+    prog.setNoiseScale(noiseScale);
+    prog.setNoiseFreq(noiseFreq);
+    prog.setFbmAmplitude(fbmAmplitude);
+
+    for (let drawable of drawables) {
+      prog.draw(drawable);
+    }
+  };
 };
 
 export default OpenGLRenderer;
