@@ -1,9 +1,13 @@
 # [Project 1: Noise](https://github.com/CIS-566-Fall-2022/hw01-fireball-base)
 
 ## Submission
+
+### View my Live Demo here: 
 [Live Demo](https://uluyek.github.io/hw01-fireball/)
 
 ![GIF DEMO](https://github.com/uluyek/hw01-fireball/blob/master/566%20HW1%20Demo.gif)
+
+### Project Summary
 
 ## Objective
 
